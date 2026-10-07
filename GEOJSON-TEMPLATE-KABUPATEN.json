@@ -1,0 +1,12 @@
+{
+  "type": "FeatureCollection",
+  "name": "TEMPLATE_BOUNDARY_KABUPATEN_GORONTALO_UTARA",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"kecamatan": "NAMA_KECAMATAN"},
+      "geometry": {"type": "Polygon", "coordinates": [[[0,0],[0,0],[0,0],[0,0]]]}
+    }
+  ],
+  "_note": "TEMPLATE ONLY. Replace with official validated GeoJSON boundary. Do not use this geometry for analysis."
+}
