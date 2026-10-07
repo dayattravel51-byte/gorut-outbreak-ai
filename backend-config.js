@@ -1,8 +1,8 @@
-// Copy this to backend-config.js and fill with your Supabase project values.
-// NEVER use a service_role key in the browser. The browser uses the public anon/publishable key.
+// Browser-safe Supabase configuration for GORUT OUTBREAK AI v98.
+// This key is publishable/anon and is protected by Supabase RLS. NEVER place a service_role/secret key here.
 window.GORUT_BACKEND = {
   provider: 'supabase',
-  url: 'https://YOUR-PROJECT.supabase.co',
-  anonKey: 'YOUR_PUBLIC_ANON_OR_PUBLISHABLE_KEY',
-  enabled: false
+  url: 'https://qknalcshivsqqjajgblj.supabase.co',
+  anonKey: 'sb_publishable_K3YYsQjH4eE7553luOEtqw_jRuuQlm0',
+  enabled: true
 };
