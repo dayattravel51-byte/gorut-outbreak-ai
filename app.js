@@ -439,8 +439,19 @@ async function authStatus(){
  const sb=await backendClient(); if(!sb){document.getElementById('roleBadge').textContent='Role: Offline';return;}
  const r=await sb.auth.getUser(); GORUT_USER=r.data.user||null;
  if(!GORUT_USER){document.getElementById('roleBadge').textContent='Role: belum login';return;}
- let role='viewer', facilityId=null, facilityName=null, fullName=null; const pr=await sb.from('profiles').select('role,full_name,facility_id,facilities:facility_id(id,name,facility_type)').eq('id',GORUT_USER.id).maybeSingle();
- if(pr.data?.role)role=pr.data.role; facilityId=pr.data?.facility_id||null; facilityName=pr.data?.facilities?.name||null; fullName=pr.data?.full_name||null; GORUT_USER={...GORUT_USER,role,facilityId,facilityName,fullName}; document.getElementById('roleBadge').textContent='Role: '+role+(facilityName?' · '+facilityName:'');
+ let role='viewer', facilityId=null, facilityName=null, fullName=null;
+ const pr=await sb.from('profiles').select('role,full_name,facility_id').eq('id',GORUT_USER.id).maybeSingle();
+ if(pr.error) console.warn('Profile lookup failed:',pr.error);
+ if(pr.data?.role) role=pr.data.role;
+ facilityId=pr.data?.facility_id||null;
+ fullName=pr.data?.full_name||null;
+ if(facilityId){
+   const fr=await sb.from('facilities').select('id,name,facility_type').eq('id',facilityId).maybeSingle();
+   if(fr.error) console.warn('Facility lookup failed:',fr.error);
+   facilityName=fr.data?.name||null;
+ }
+ GORUT_USER={...GORUT_USER,role,facilityId,facilityName,fullName};
+ document.getElementById('roleBadge').textContent='Role: '+role+(facilityName?' · '+facilityName:'');
  const d=document.getElementById('backendDetail'); if(d)d.textContent=`Login: ${GORUT_USER.email||'-'} | Role: ${role}${facilityName?' | Fasyankes: '+facilityName:''}`;
 }
 function erf(x){const sign=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return sign*y}
