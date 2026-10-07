@@ -20,6 +20,8 @@ jobs:
           touch .nojekyll
           echo "GORUT OUTBREAK AI v98" > .deployment-version
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
