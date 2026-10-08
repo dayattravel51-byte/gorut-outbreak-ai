@@ -4287,30 +4287,33 @@ try{installBrandingV67();}catch(e){}
     login.style.display='grid';
     login.innerHTML='<div class="loginbox" style="max-width:430px"><div style="font-size:12px;letter-spacing:1px;font-weight:700;color:#1769aa">GORUT-OUTBREAK AI</div><h2 style="margin:8px 0 4px">🔐 Login Sistem</h2><p class="small">Surveilans Epidemiologi Kabupaten Gorontalo Utara</p><div class="field"><label>Email</label><input id="authEmail" type="email" autocomplete="username" placeholder="Email akun Supabase"></div><div class="field"><label>Kata sandi</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Kata sandi"></div><button id="finalLoginBtn" class="primary" style="width:100%;margin-top:8px">Masuk</button><div id="authMsg" class="notice" style="display:none;margin-top:12px"></div></div>';
     const btn=document.getElementById('finalLoginBtn');
-    if(btn)btn.onclick=async function(){
-      const email=(document.getElementById('authEmail')?.value||'').trim().toLowerCase();
-      const password=document.getElementById('authPassword')?.value||'';
+    if(btn)btn.addEventListener('click',async function(){
       const msg=document.getElementById('authMsg');
-      if(!email||!password){msg.style.display='block';msg.textContent='Email dan kata sandi wajib diisi.';return;}
-      btn.disabled=true;btn.textContent='Memproses…';
       try{
+        const email=(document.getElementById('authEmail')?.value||'').trim().toLowerCase();
+        const password=document.getElementById('authPassword')?.value||'';
+        if(!email||!password){msg.style.display='block';msg.textContent='Email dan kata sandi wajib diisi.';return;}
+        btn.disabled=true;btn.textContent='Memproses…';msg.style.display='block';msg.textContent='Menghubungkan ke Supabase…';
         const sb=await backendClient();
-        if(!sb)throw new Error('Backend Supabase belum tersedia.');
+        if(!sb)throw new Error('Supabase JS belum berhasil dimuat. Silakan refresh halaman.');
+        msg.textContent='Memverifikasi email dan kata sandi…';
         const r=await Promise.race([
           sb.auth.signInWithPassword({email,password}),
-          new Promise((_,reject)=>setTimeout(()=>reject(new Error('Koneksi ke Supabase timeout setelah 15 detik. Periksa koneksi internet lalu coba lagi.')),15000))
+          new Promise((_,reject)=>setTimeout(()=>reject(new Error('Koneksi ke Supabase timeout setelah 15 detik.')),15000))
         ]);
         if(r.error)throw r.error;
         GORUT_USER=r.data.user;
+        msg.textContent='Login berhasil. Memuat profil pengguna…';
         await authStatus();
         login.style.display='none';app.style.display='block';
         try{setRoleUI()}catch(e){}
         try{await render()}catch(e){console.error(e)}
       }catch(e){
-        msg.style.display='block';msg.textContent='Login gagal: '+(e.message||e);
+        console.error('GORUT LOGIN ERROR',e);
+        msg.style.display='block';msg.textContent='Login gagal: '+(e?.message||String(e));
         btn.disabled=false;btn.textContent='Masuk';
       }
-    };
+    });
   }
   // Run last, after all legacy startup layers have loaded, so no old version can replace the gate.
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(finalAuthGate,120));
