@@ -4272,7 +4272,10 @@ try{installBrandingV67();}catch(e){}
       try{
         const sb=await backendClient();
         if(!sb)throw new Error('Backend Supabase belum tersedia.');
-        const r=await sb.auth.signInWithPassword({email,password});
+        const r=await Promise.race([
+          sb.auth.signInWithPassword({email,password}),
+          new Promise((_,reject)=>setTimeout(()=>reject(new Error('Koneksi ke Supabase timeout setelah 15 detik. Periksa koneksi internet lalu coba lagi.')),15000))
+        ]);
         if(r.error)throw r.error;
         GORUT_USER=r.data.user;
         await authStatus();
