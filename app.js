@@ -4267,3 +4267,41 @@ try{installBrandingV67();}catch(e){}
   const oldPage=window.page;if(oldPage&&!window.__v98PagePatched){window.page=function(id,b){const r=oldPage.apply(this,arguments);if(id==='responseManagement')setTimeout(v98Render,60);return r};window.__v98PagePatched=true}
   window.addEventListener('load',()=>setTimeout(()=>{try{inject()}catch(e){console.warn('v98 inject',e)}},900));
 })();
+
+
+/* FINAL AUTH GATE v99 */
+(function(){
+  function finalAuthGate(){
+    const login=document.getElementById('login'), app=document.getElementById('app');
+    if(!login||!app)return;
+    // Never expose the operational application before authentication.
+    app.style.display='none';
+    login.style.display='grid';
+    login.innerHTML='<div class="loginbox" style="max-width:430px"><div style="font-size:12px;letter-spacing:1px;font-weight:700;color:#1769aa">GORUT-OUTBREAK AI</div><h2 style="margin:8px 0 4px">🔐 Login Sistem</h2><p class="small">Surveilans Epidemiologi Kabupaten Gorontalo Utara</p><div class="field"><label>Email</label><input id="authEmail" type="email" autocomplete="username" placeholder="Email akun Supabase"></div><div class="field"><label>Kata sandi</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Kata sandi"></div><button id="finalLoginBtn" class="primary" style="width:100%;margin-top:8px">Masuk</button><div id="authMsg" class="notice" style="display:none;margin-top:12px"></div></div>';
+    const btn=document.getElementById('finalLoginBtn');
+    if(btn)btn.onclick=async function(){
+      const email=(document.getElementById('authEmail')?.value||'').trim().toLowerCase();
+      const password=document.getElementById('authPassword')?.value||'';
+      const msg=document.getElementById('authMsg');
+      if(!email||!password){msg.style.display='block';msg.textContent='Email dan kata sandi wajib diisi.';return;}
+      btn.disabled=true;btn.textContent='Memproses…';
+      try{
+        const sb=await backendClient();
+        if(!sb)throw new Error('Backend Supabase belum tersedia.');
+        const r=await sb.auth.signInWithPassword({email,password});
+        if(r.error)throw r.error;
+        GORUT_USER=r.data.user;
+        await authStatus();
+        login.style.display='none';app.style.display='block';
+        try{setRoleUI()}catch(e){}
+        try{await render()}catch(e){console.error(e)}
+      }catch(e){
+        msg.style.display='block';msg.textContent='Login gagal: '+(e.message||e);
+        btn.disabled=false;btn.textContent='Masuk';
+      }
+    };
+  }
+  // Run last, after all legacy startup layers have loaded, so no old version can replace the gate.
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(finalAuthGate,120));
+  else setTimeout(finalAuthGate,120);
+})();
