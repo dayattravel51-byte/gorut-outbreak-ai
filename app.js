@@ -1698,19 +1698,14 @@ setTimeout(()=>{try{injectDeletes();v30RefreshAdmin()}catch(e){}},1200);
     removeLegacyAccessUI();
     commandCenterCard();
     renderCommandCenter();
-    const rb=document.getElementById('roleBadge');if(rb)rb.textContent='Akses: penuh';
     return result;
   };
 
-  function startOpen(){
-    removeLegacyAccessUI();
-    const app=document.getElementById('app'); if(app)app.style.display='block';
-    window.GORUT_USER={id:'open-access',email:'',role:'admin_kabupaten'};
-    try{setRoleUI();}catch(e){}
-    try{initDiseaseSelectors();}catch(e){}
-    try{window.render();}catch(e){console.error('v43 startup',e)}
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startOpen);else setTimeout(startOpen,0);
+  // v43 open-access startup RETIRED. Authentication is enforced by v57/v89.
+  // Keep the v43 rendering enhancements, but never create an implicit admin session
+  // and never force the app container visible before successful Supabase login.
+  function startOpen(){}
+  if(false)document.addEventListener('DOMContentLoaded',startOpen);
 })();
 
 
