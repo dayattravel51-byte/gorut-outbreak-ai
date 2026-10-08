@@ -3861,15 +3861,29 @@ try{installBrandingV67();}catch(e){}
   async function boot89(){
     if(!enabled89()){
       const b=e89('backendBadge'); if(b)b.textContent='Mode: lokal / belum terhubung';
+      e89('app').style.display='none'; ensureLoginUI();
       return;
     }
     const sb=await backendClient(); if(!sb)return;
-    const r=await sb.auth.getUser();
-    if(r.data?.user){GORUT_USER=r.data.user; await authStatus(); e89('login').style.display='none'; e89('app').style.display='block'; setRoleUI(); render();}
-    else {e89('app').style.display='none'; ensureLoginUI();}
+    // SECURITY/UAT: every fresh page open starts at the login gate.
+    // Do not restore a previous Supabase browser session automatically.
+    try{ await sb.auth.signOut({scope:'local'}); }catch(e){ console.warn('Initial session reset:',e); }
+    GORUT_USER=null;
+    e89('app').style.display='none';
+    e89('login').style.display='block';
+    ensureLoginUI();
     sb.auth.onAuthStateChange((_event,session)=>{
-      if(session?.user){GORUT_USER=session.user; e89('login').style.display='none';e89('app').style.display='block';authStatus().then(()=>{setRoleUI();render()});}
-      else {GORUT_USER=null;e89('app').style.display='none';ensureLoginUI();}
+      if(session?.user){
+        GORUT_USER=session.user;
+        e89('login').style.display='none';
+        e89('app').style.display='block';
+        authStatus().then(()=>{setRoleUI();render()});
+      }else{
+        GORUT_USER=null;
+        e89('app').style.display='none';
+        e89('login').style.display='block';
+        ensureLoginUI();
+      }
     });
   }
   window.gorutProductionLogout=async function(){const sb=await backendClient();if(sb)await sb.auth.signOut();else location.reload()};
