@@ -332,51 +332,50 @@ window.openDemographyTableV68=function(btn){
 };
 </script>
 <script>
-/* LOGIN FAILSAFE v100 — delegated handler, independent of app.js */
+/* LOGIN FAILSAFE v101 — capture click + service-worker reset */
 (function(){
-  function install(){
-    const btn=document.getElementById('finalLoginBtn');
-    if(!btn || btn.dataset.failsafe==='1') return;
-    btn.dataset.failsafe='1';
-    const clone=btn.cloneNode(true);
-    btn.replaceWith(clone);
-    clone.addEventListener('click',async function(){
-      const msg=document.getElementById('authMsg');
-      const email=(document.getElementById('authEmail')?.value||'').trim().toLowerCase();
-      const password=document.getElementById('authPassword')?.value||'';
-      const show=s=>{if(msg){msg.style.display='block';msg.textContent=s;}};
-      if(!email||!password){show('Email dan kata sandi wajib diisi.');return;}
-      clone.disabled=true;clone.textContent='Memproses…';show('1/3 Menghubungkan ke Supabase…');
-      try{
-        if(!window.GORUT_BACKEND?.enabled) throw new Error('Konfigurasi backend tidak aktif.');
-        if(!window.supabase) throw new Error('Library Supabase JS belum termuat. Periksa koneksi/CDN lalu refresh.');
-        if(!window.__gorutSupabase) window.__gorutSupabase=window.supabase.createClient(window.GORUT_BACKEND.url,window.GORUT_BACKEND.anonKey);
-        const sb=window.__gorutSupabase;
-        show('2/3 Memverifikasi email dan kata sandi…');
-        const result=await Promise.race([
-          sb.auth.signInWithPassword({email,password}),
-          new Promise((_,reject)=>setTimeout(()=>reject(new Error('Koneksi Supabase timeout setelah 15 detik.')),15000))
-        ]);
-        if(result.error) throw result.error;
-        show('3/3 Login berhasil. Memuat profil…');
-        window.GORUT_USER=result.data.user;
-        if(typeof window.authStatus==='function') await window.authStatus();
-        const login=document.getElementById('login'),app=document.getElementById('app');
-        if(login)login.style.display='none';
-        if(app)app.style.display='block';
-        if(typeof window.setRoleUI==='function') window.setRoleUI();
-        if(typeof window.render==='function') await window.render();
-      }catch(e){
-        console.error('LOGIN FAILSAFE',e);
-        show('LOGIN GAGAL: '+(e?.message||String(e)));
-        clone.disabled=false;clone.textContent='Masuk';
-      }
-    });
+  function ensure(){
+    var box=document.getElementById('login'), msg=document.getElementById('authMsg');
+    if(box && !document.getElementById('loginDiag')){
+      var d=document.createElement('div'); d.id='loginDiag'; d.textContent='Status sistem: JavaScript aktif'; d.style='position:fixed;bottom:12px;left:12px;right:12px;z-index:99999;background:#fff;padding:8px 12px;border:1px solid #cbd5e1;border-radius:8px;font:12px Arial;color:#475569;text-align:center;box-shadow:0 4px 16px #0002';
+      document.body.appendChild(d);
+    }
   }
-  const obs=new MutationObserver(install);
-  obs.observe(document.documentElement,{childList:true,subtree:true});
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install); else install();
+  async function login(){
+    var msg=document.getElementById('authMsg'), btn=document.getElementById('finalLoginBtn');
+    var email=(document.getElementById('authEmail')?.value||'').trim().toLowerCase();
+    var password=document.getElementById('authPassword')?.value||'';
+    var show=function(s){ensure();var d=document.getElementById('loginDiag');if(d)d.textContent=s;if(msg){msg.style.display='block';msg.textContent=s;}};
+    show('Tombol login terdeteksi. Memulai koneksi...');
+    if(!email||!password){show('LOGIN GAGAL: Email dan kata sandi wajib diisi.');return;}
+    if(btn){btn.disabled=true;btn.textContent='Memproses…';}
+    try{
+      if(!window.GORUT_BACKEND?.enabled) throw new Error('Konfigurasi backend tidak aktif.');
+      if(!window.supabase) throw new Error('Library Supabase JS belum termuat.');
+      if(!window.__gorutSupabase) window.__gorutSupabase=window.supabase.createClient(window.GORUT_BACKEND.url,window.GORUT_BACKEND.anonKey);
+      show('Menghubungkan ke Supabase...');
+      var result=await Promise.race([window.__gorutSupabase.auth.signInWithPassword({email:email,password:password}),new Promise(function(_,reject){setTimeout(function(){reject(new Error('Koneksi Supabase timeout setelah 15 detik.'));},15000);})]);
+      if(result.error) throw result.error;
+      show('LOGIN BERHASIL. Memuat profil...');
+      window.GORUT_USER=result.data.user;
+      if(typeof window.authStatus==='function') await window.authStatus();
+      var l=document.getElementById('login'),a=document.getElementById('app');if(l)l.style.display='none';if(a)a.style.display='block';
+      if(typeof window.setRoleUI==='function')window.setRoleUI();if(typeof window.render==='function')await window.render();
+    }catch(e){
+      console.error(e);show('LOGIN GAGAL: '+(e?.message||String(e)));if(btn){btn.disabled=false;btn.textContent='Masuk';}
+    }
+  }
+  document.addEventListener('click',function(e){
+    var t=e.target&&e.target.closest?e.target.closest('#finalLoginBtn'):null;
+    if(t){e.preventDefault();e.stopImmediatePropagation();login();}
+  },true);
+  function boot(){
+    ensure();
+    if(navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});}).catch(function(){});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  new MutationObserver(ensure).observe(document.documentElement,{childList:true,subtree:true});
 })();
-</script>
+
 <script>if ("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));</script>
 </body></html>
