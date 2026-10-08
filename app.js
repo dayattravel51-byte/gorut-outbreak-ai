@@ -1751,9 +1751,9 @@ setTimeout(()=>{try{injectDeletes();v30RefreshAdmin()}catch(e){}},1200);
       (msg?'<div class="notice" style="border-left-color:#b42318">'+esc45(msg)+'</div>':'')+
       '<div class="field"><label>Jenis Pengguna</label><select id="v45Role" onchange="v45RoleChanged()"><option value="puskesmas_rs">Surveilans Puskesmas dan Rumah Sakit</option><option value="dinkes_kab">Surveilans Dinkes Kabupaten</option><option value="dinkes_prov">Surveilans Dinkes Provinsi</option><option value="admin">Admin</option></select></div>'+
       '<div id="v45AdminSetup" style="display:'+(adminReady?'none':'block')+'" class="notice"><b>Pengaturan awal Admin</b><br>Belum ada akun Admin aktif. Buat akun Admin pertama untuk mengelola persetujuan pengguna.</div>'+
-      '<div class="field"><label>Nama User</label><input id="v45LoginName" autocomplete="username" placeholder="Nama user"></div>'+
+      '<div class="field"><label>Email akun UAT / Supabase Auth</label><input id="v45LoginName" type="email" autocomplete="username" placeholder="email akun UAT"></div>'+
       '<div class="field"><label>Password</label><input id="v45LoginPass" type="password" autocomplete="current-password" placeholder="Password"></div>'+
-      '<div class="field" id="v45LoginWaWrap"><label>Nomor WhatsApp terdaftar</label><input id="v45LoginWa" inputmode="tel" placeholder="08xxxxxxxxxx"></div>'+
+      '<div class="field" id="v45LoginWaWrap" style="display:none"><label>Nomor WhatsApp terdaftar</label><input id="v45LoginWa" inputmode="tel" placeholder="08xxxxxxxxxx"></div>'+
       '<button class="primary" style="width:100%;margin-top:4px" onclick="v45Login()">🔐 Login</button>'+
       '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'+
       '<button class="btn-ghost" style="flex:1" onclick="v45ShowRegister()">📝 Daftar Pengguna</button>'+
@@ -1766,8 +1766,8 @@ setTimeout(()=>{try{injectDeletes();v30RefreshAdmin()}catch(e){}},1200);
     const role=document.getElementById('v45Role')?.value; const wa=document.getElementById('v45LoginWaWrap'); const setup=document.getElementById('v45AdminSetup');
     if(wa)wa.style.display=role==='admin'?'none':'block';
     if(setup)setup.style.display=role==='admin'&&!ensureAdminSetup()?'block':'none';
-    const n=document.getElementById('v45LoginName'); if(n)n.placeholder=role==='admin'&&!ensureAdminSetup()?'Nama Admin pertama':'Nama user';
-    const hint=document.getElementById('v45LoginHint'); if(hint)hint.textContent=role==='admin'?(ensureAdminSetup()?'Login sebagai Admin. Admin memiliki akses penuh dan mengelola persetujuan pengguna.':'Buat akun Admin pertama dengan nama dan password, lalu login.'):'Akun harus berstatus DIIZINKAN setelah Admin menjawab "silahkan" melalui WhatsApp.';
+    const n=document.getElementById('v45LoginName'); if(n)n.placeholder='email akun UAT';
+    const hint=document.getElementById('v45LoginHint'); if(hint)hint.textContent='Gunakan email dan password akun Supabase Auth. Jenis Pengguna di atas tidak menentukan hak akses; role aplikasi dibaca dari profil Supabase.';
   };
   window.v45ShowRegister=function(){
     let m=document.getElementById('registerModal');
@@ -1788,7 +1788,25 @@ setTimeout(()=>{try{injectDeletes();v30RefreshAdmin()}catch(e){}},1200);
   };
   window.v45RegisterAndWA=function(){return v45Register(true)};
   window.v45Login=async function(){
-    const role=document.getElementById('v45Role')?.value,name=(document.getElementById('v45LoginName')?.value||'').trim(),pw=document.getElementById('v45LoginPass')?.value||'',wa=(document.getElementById('v45LoginWa')?.value||'').trim();
+    const role=document.getElementById('v45Role')?.value,name=(document.getElementById('v45LoginName')?.value||'').trim(),pw=document.getElementById('v45LoginPass')?.value||'';
+    const sb=await backendClient();
+    if(!sb)return showLogin('Backend Supabase belum tersedia. Muat ulang halaman lalu coba lagi.');
+    if(!name||!pw)return showLogin('Email akun UAT dan password wajib diisi.');
+    const auth=await sb.auth.signInWithPassword({email:name,password:pw});
+    if(auth.error)return showLogin('Login Supabase gagal: '+auth.error.message);
+    const uid=auth.data.user?.id;
+    const pr=await sb.from('profiles').select('role,full_name,facility_id,is_active').eq('id',uid).maybeSingle();
+    if(pr.error||!pr.data)return showLogin('Akun Auth berhasil, tetapi profil aplikasi belum terdaftar. Hubungi Admin.');
+    if(pr.data.is_active===false)return showLogin('Profil pengguna tidak aktif. Hubungi Admin.');
+    let facilityName=null;
+    if(pr.data.facility_id){const fr=await sb.from('facilities').select('name').eq('id',pr.data.facility_id).maybeSingle();facilityName=fr.data?.name||null;}
+    window.GORUT_USER={...auth.data.user,role:pr.data.role,facilityId:pr.data.facility_id||null,facilityName,fullName:pr.data.full_name||null};
+    GORUT_USER=window.GORUT_USER;
+    const app=document.getElementById('app');if(app)app.style.display='block';const login=document.getElementById('login');if(login)login.style.display='none';
+    const rb=document.getElementById('roleBadge');if(rb)rb.textContent='Role: '+pr.data.role+(facilityName?' · '+facilityName:'');
+    try{setRoleUI()}catch(e){} try{await authStatus()}catch(e){} try{window.render()}catch(e){}
+    return;
+    /* Legacy local v45 authentication intentionally disabled. */
     if(!name||!pw)return showLogin('Nama user dan password wajib diisi.');
     let users=readUsers();
     if(role==='admin'&&!ensureAdminSetup()){
