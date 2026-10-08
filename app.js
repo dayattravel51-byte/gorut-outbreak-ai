@@ -1666,7 +1666,7 @@ setTimeout(()=>{try{injectDeletes();v30RefreshAdmin()}catch(e){}},1200);
   // Open operational mode: no registration, payment, subscription or expiry gate.
   window.GORUT_USER={id:'open-access',email:'',role:'admin_kabupaten'};
   window.GORUT_OPEN_ACCESS=true;
-  if(window.GORUT_BACKEND) window.GORUT_BACKEND.enabled=false;
+  /* Backend remains enabled for real Supabase authentication. */
   window.enforceAccess=function(){return true};
   window.showRegister=function(){};
   window.closeRegister=function(){};
