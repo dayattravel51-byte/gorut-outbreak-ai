@@ -386,7 +386,31 @@ function exportProject(){let payload={app:'GORUT-OUTBREAK AI',version:'v9',expor
 async function backendClient(){
   const c=window.GORUT_BACKEND||{};
   if(!c.enabled||!c.url||!c.anonKey||c.url.includes('YOUR-PROJECT')) return null;
-  if(!window.supabase) return null;
+  if(!window.supabase){
+    if(!window.__gorutSupabaseLoader){
+      window.__gorutSupabaseLoader=new Promise((resolve,reject)=>{
+        const urls=[
+          'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+          'https://unpkg.com/@supabase/supabase-js@2'
+        ];
+        let i=0;
+        const load=()=>{
+          if(window.supabase)return resolve();
+          if(i>=urls.length)return reject(new Error('Library Supabase JS gagal dimuat dari CDN.'));
+          const s=document.createElement('script');
+          s.src=urls[i++];
+          s.async=true;
+          s.onload=()=>window.supabase?resolve():load();
+          s.onerror=()=>load();
+          document.head.appendChild(s);
+        };
+        load();
+        setTimeout(()=>reject(new Error('Library Supabase JS timeout.')),12000);
+      });
+    }
+    try{await window.__gorutSupabaseLoader}catch(e){console.error('Supabase JS loader',e);return null;}
+  }
+  if(!window.supabase)return null;
   if(!window.__gorutSupabase) window.__gorutSupabase=window.supabase.createClient(c.url,c.anonKey);
   return window.__gorutSupabase;
 }
