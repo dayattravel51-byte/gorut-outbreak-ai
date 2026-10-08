@@ -1801,23 +1801,7 @@ setTimeout(()=>{try{injectDeletes();v30RefreshAdmin()}catch(e){}},1200);
     const rb=document.getElementById('roleBadge');if(rb)rb.textContent='Role: '+pr.data.role+(facilityName?' · '+facilityName:'');
     try{setRoleUI()}catch(e){} try{await authStatus()}catch(e){} try{window.render()}catch(e){}
     return;
-    /* Legacy local v45 authentication intentionally disabled. */
-    if(!name||!pw)return showLogin('Nama user dan password wajib diisi.');
-    let users=readUsers();
-    if(role==='admin'&&!ensureAdminSetup()){
-      if(!name||!pw)return showLogin('Nama dan password Admin pertama wajib diisi.');
-      const rec={id:'ADM-'+Date.now(),name,passwordHash:await hash45(pw),whatsapp:'',role:'admin',status:'aktif',requestedAt:new Date().toISOString(),approvedAt:new Date().toISOString()};users.push(rec);writeUsers(users);alert('Akun Admin pertama berhasil dibuat. Silakan login kembali.');showLogin();document.getElementById('v45Role').value='admin';v45RoleChanged();return;
-    }
-    const u=users.find(x=>x.name.toLowerCase()===name.toLowerCase()&&x.role===role);
-    if(!u)return showLogin('User belum terdaftar pada jenis pengguna tersebut. Silakan daftar terlebih dahulu.');
-    if(await hash45(pw)!==u.passwordHash)return showLogin('Password tidak sesuai.');
-    if(role!=='admin'&&String(u.whatsapp).replace(/\D/g,'')!==String(wa).replace(/\D/g,''))return showLogin('Nomor WhatsApp tidak sesuai dengan nomor saat pendaftaran.');
-    if(u.status!=='aktif')return showLogin('Akun belum diizinkan Admin. Kirim WhatsApp Admin dan tunggu jawaban "silahkan".');
-    localStorage.setItem(SESSION_KEY,JSON.stringify({id:u.id,at:new Date().toISOString()}));
-    window.GORUT_USER={id:u.id,email:u.name,role:u.role,displayName:u.name,whatsapp:u.whatsapp}; GORUT_USER=window.GORUT_USER;
-    const app=document.getElementById('app');if(app)app.style.display='block';const login=document.getElementById('login');if(login)login.style.display='none';
-    const rb=document.getElementById('roleBadge');if(rb)rb.textContent='User: '+roleLabel[u.role]+' · Akses penuh';
-    try{setRoleUI()}catch(e){} try{window.render()}catch(e){}
+
   };
   window.v45Logout=function(){localStorage.removeItem(SESSION_KEY);window.GORUT_USER=null;GORUT_USER=null;showLogin();const app=document.getElementById('app');if(app)app.style.display='none'};
   window.v45Approve=function(id){const users=readUsers();const u=users.find(x=>x.id===id);if(!u)return alert('User tidak ditemukan.');u.status='aktif';u.approvedAt=new Date().toISOString();writeUsers(users);renderV45Admin();alert('Akun '+u.name+' sekarang DIIZINKAN login.');};
