@@ -1,4 +1,7 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="id"><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GORUT-OUTBREAK AI v95 — Surveilans Epidemiologi Gorontalo Utara</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#102a43"><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#172033}*{box-sizing:border-box}
@@ -160,7 +163,7 @@ aside nav button{flex:none!important}
 @media(max-width:800px){#lapangan>.card{display:block!important}}
 </style>
 </head><body>
-<div id="login" style="display:grid"><div class="login"><div class="loginbox"><div style="font-size:12px;letter-spacing:1px;font-weight:700;color:#1769aa">GORUT-OUTBREAK AI</div><h2 style="margin:8px 0 4px">🔐 Login Sistem</h2><p class="small">Surveilans Epidemiologi Kabupaten Gorontalo Utara</p><div class="field"><label>Email</label><input id="authEmail" type="email" autocomplete="username" placeholder="Email akun Supabase"></div><div class="field"><label>Kata sandi</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Kata sandi"></div><button id="staticLoginBtn" type="button" class="primary" style="width:100%;margin-top:8px" onclick="this.disabled=true;this.textContent='Memproses...';var m=document.getElementById('authMsg');m.style.display='block';m.textContent='LOGIN ENGINE v103 AKTIF — tombol berhasil diklik.';if(window.gorutDirectLogin) window.gorutDirectLogin();">Masuk</button><div id="authMsg" class="notice" style="display:none;margin-top:12px"></div></div></div></div><div id="registerModal" style="display:none"></div>
+<div id="login" style="display:grid"><div class="login"><div class="loginbox"><div style="font-size:12px;letter-spacing:1px;font-weight:700;color:#1769aa">GORUT-OUTBREAK AI</div><h2 style="margin:8px 0 4px">🔐 Login Sistem</h2><p class="small">Surveilans Epidemiologi Kabupaten Gorontalo Utara</p><div class="field"><label>Email</label><input id="authEmail" type="email" autocomplete="username" placeholder="Email akun Supabase"></div><div class="field"><label>Kata sandi</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Kata sandi"></div><button id="staticLoginBtn" type="button" class="primary" style="width:100%;margin-top:8px" onclick="this.disabled=true;this.textContent='Memproses...';var m=document.getElementById('authMsg');m.style.display='block';m.textContent='LOGIN ENGINE v105 AKTIF — tombol berhasil diklik.';if(window.gorutDirectLogin) window.gorutDirectLogin();">Masuk</button><div id="authMsg" class="notice" style="display:none;margin-top:12px"></div></div></div></div><div id="registerModal" style="display:none"></div>
 <div id="app" style="display:none"><div id="v29Topbar" class="topbar-v29" style="display:none"><div class="topbar-left"><span class="brand-mini">GORUT-OUTBREAK AI</span><span id="v29AccessPill" class="access-pill">Memeriksa akses…</span></div><div class="profile-menu-v29"><button class="btn-ghost" onclick="toggleV29Profile()">👤 <span id="v29UserLabel">Pengguna</span> ▾</button><div id="v29ProfilePanel" class="profile-panel-v29"><div id="v29ProfileBody"></div><div style="display:flex;gap:7px;margin-top:10px"><button class="btn-ghost" onclick="toggleV29Profile()">Tutup</button><button class="btn-danger" onclick="v29Logout()">Keluar</button></div></div></div></div><aside><div class="gorut-sidebar-brand"><div class="brand-mark">GO</div><div><strong>GORUT-OUTBREAK AI</strong><small>Surveilans Epidemiologi</small></div></div><nav>
 <button class="active" onclick="page('dashboard',this)">📊 Dashboard</button><button class="primary" onclick="openDemographyTableV68(this)">👥 TABEL ISIAN DEMOGRAFI</button><button onclick="page('risiko',this)">⚠️ Risk & Early Warning</button><button onclick="page('lapangan',this)">📱 Formulir Lapangan</button><button onclick="window.open('mobile.html','_blank','noopener')">📲 Buka Formulir HP</button><button onclick="page('alert',this)">🚨 Alert SKDR</button><button onclick="window.open('public_dashboard.html','_blank','noopener')">🌐 KABAR SERGAP Publik</button><button onclick="page('investigasi',this)">🧭 Investigasi KLB</button><button onclick="page('kuesioner',this)">📝 Kuesioner</button><button onclick="page('kasus',this)">👥 Daftar Kasus</button><button onclick="page('kontak',this)">🔗 Kontak</button><button onclick="page('rantai',this)">🧬 Rantai Penularan</button><button onclick="page('spesimen',this)">🧪 Spesimen</button><button onclick="page('analisis',this)">📈 Analisis</button><button onclick="page('penelitian',this)">🔬 Penelitian</button><button onclick="page('gis',this)">🗺️ GIS Kasus</button><button onclick="page('spatiotemporal',this);setTimeout(renderV96Spatiotemporal,60)">📈 Spatiotemporal Epi</button><button onclick="page('earlyWarning',this);setTimeout(renderV97EarlyWarning,60)">🚨 Early Warning</button><button onclick="page('adminEpi',this);renderAdminEpiDashboard()">🏘️ Dashboard Administratif</button><button onclick="page('demografi',this);renderDemographyV49()">👥 Demografi & IR</button><button onclick="page('laporan',this)">📄 Laporan</button><button onclick="page('laporan',this);setTimeout(runEpiIntelligence,80)">📊 P-T-W</button><button onclick="page('intel',this)">🧠 Disease Intelligence</button><button onclick="page('master',this)">📚 Master Instrumen</button><button onclick="page('audit',this)">🧪 Audit Workflow</button><button onclick="page('admin',this)">⚙️ Admin</button></nav></aside>
 <main><div style="display:flex;justify-content:space-between"><div><div class="gorut-main-brand"><div class="main-brand-mark">GO</div><div><h1 id="title" style="margin:0">Dashboard</h1><p style="margin:2px 0 0">GORUT-OUTBREAK AI · Platform Surveilans Epidemiologi Kabupaten Gorontalo Utara</p></div></div></div><span class="badge" id="backendBadge">Mode: lokal</span><span class="badge" id="roleBadge">Akses: penuh</span></div>
@@ -425,7 +428,7 @@ window.openDemographyTableV68=function(btn){
   new MutationObserver(install).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>
-<script>/* Service worker disabled for auth debugging v103 */</script>
+<script>/* Service worker disabled for auth debugging v105 */</script>
 <script>
 window.gorutDirectLogin=async function(){
   var msg=document.getElementById('authMsg'),btn=document.getElementById('staticLoginBtn');
@@ -435,10 +438,10 @@ window.gorutDirectLogin=async function(){
   if(!email||!password){show('LOGIN GAGAL: Email dan kata sandi wajib diisi.');if(btn){btn.disabled=false;btn.textContent='Masuk';}return;}
   try{
     if(!window.GORUT_BACKEND?.enabled) throw new Error('Konfigurasi backend tidak aktif.');
-    show('LOGIN ENGINE v103 — menghubungkan ke Supabase...');
+    show('LOGIN ENGINE v105 — menghubungkan ke Supabase...');
     if(!window.supabase) throw new Error('Library Supabase JS belum termuat.');
     window.__gorutSupabase=window.__gorutSupabase||window.supabase.createClient(window.GORUT_BACKEND.url,window.GORUT_BACKEND.anonKey);
-    show('LOGIN ENGINE v103 — memverifikasi akun...');
+    show('LOGIN ENGINE v105 — memverifikasi akun...');
     var result=await Promise.race([window.__gorutSupabase.auth.signInWithPassword({email:email,password:password}),new Promise(function(_,reject){setTimeout(function(){reject(new Error('Koneksi Supabase timeout setelah 15 detik.'));},15000);})]);
     if(result.error) throw result.error;
     show('LOGIN BERHASIL — memuat profil...');
@@ -449,7 +452,7 @@ window.gorutDirectLogin=async function(){
     if(typeof window.setRoleUI==='function') window.setRoleUI();
     if(typeof window.render==='function') await window.render();
   }catch(err){
-    console.error('GORUT LOGIN v103',err);
+    console.error('GORUT LOGIN v105',err);
     show('LOGIN GAGAL: '+(err?.message||String(err)));
     if(btn){btn.disabled=false;btn.textContent='Masuk';}
   }
