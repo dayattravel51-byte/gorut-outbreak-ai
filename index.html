@@ -377,5 +377,52 @@ window.openDemographyTableV68=function(btn){
   new MutationObserver(ensure).observe(document.documentElement,{childList:true,subtree:true});
 })();
 
+<!-- LOGIN STATIC FAILSAFE v102 -->
+<script>
+(function(){
+  function install(){
+    var btn=document.getElementById('staticLoginBtn');
+    if(!btn || btn.dataset.v102==='1') return;
+    btn.dataset.v102='1';
+    btn.addEventListener('click',async function(e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      var msg=document.getElementById('authMsg');
+      var show=function(s){if(msg){msg.style.display='block';msg.textContent=s;}};
+      var email=(document.getElementById('authEmail')?.value||'').trim().toLowerCase();
+      var password=document.getElementById('authPassword')?.value||'';
+      show('LOGIN: tombol terdeteksi. Memulai...');
+      if(!email||!password){show('LOGIN GAGAL: Email dan kata sandi wajib diisi.');return;}
+      btn.disabled=true;btn.textContent='Memproses...';
+      try{
+        var c=window.GORUT_BACKEND;
+        if(!c||!c.enabled) throw new Error('Konfigurasi backend tidak aktif.');
+        show('LOGIN: memuat koneksi Supabase...');
+        if(!window.supabase) throw new Error('Library Supabase JS belum termuat.');
+        window.__gorutSupabase=window.__gorutSupabase||window.supabase.createClient(c.url,c.anonKey);
+        show('LOGIN: memverifikasi email dan kata sandi...');
+        var result=await Promise.race([
+          window.__gorutSupabase.auth.signInWithPassword({email:email,password:password}),
+          new Promise(function(_,reject){setTimeout(function(){reject(new Error('Koneksi Supabase timeout setelah 15 detik.'));},15000);})
+        ]);
+        if(result.error) throw result.error;
+        show('LOGIN BERHASIL: memuat profil...');
+        window.GORUT_USER=result.data.user;
+        if(typeof window.authStatus==='function') await window.authStatus();
+        document.getElementById('login').style.display='none';
+        document.getElementById('app').style.display='block';
+        if(typeof window.setRoleUI==='function') window.setRoleUI();
+        if(typeof window.render==='function') await window.render();
+      }catch(err){
+        console.error('GORUT LOGIN v102',err);
+        show('LOGIN GAGAL: '+(err?.message||String(err)));
+        btn.disabled=false;btn.textContent='Masuk';
+      }
+    },true);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
+  new MutationObserver(install).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
 <script>if ("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));</script>
 </body></html>
