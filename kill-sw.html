@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Memulihkan GORUT OUTBREAK AI</title></head>
+<body style="font-family:Arial,sans-serif;padding:32px">
+<h2>Memulihkan sistem…</h2><p id="m">Membersihkan cache aplikasi dan service worker lama.</p>
+<script>
+(async()=>{
+  const m=document.getElementById('m');
+  try{
+    if('serviceWorker' in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }
+    if('caches' in window){
+      const keys=await caches.keys();
+      await Promise.all(keys.map(k=>caches.delete(k)));
+    }
+    m.textContent='Pemulihan selesai. Membuka GORUT OUTBREAK AI…';
+  }catch(e){
+    m.textContent='Pemulihan selesai sebagian. Membuka aplikasi…';
+  }
+  setTimeout(()=>location.replace('./index.html?v=104'),700);
+})();
+</script>
+</body></html>
